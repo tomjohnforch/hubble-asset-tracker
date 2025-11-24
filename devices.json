@@ -1,0 +1,265 @@
+[
+  {
+    "id": "BT-001",
+    "name": "Cape Canaveral Ground Station",
+    "lat": 28.5729,
+    "lng": -80.649,
+    "status": "online",
+    "type": "ground-station"
+  },
+  {
+    "id": "BT-002",
+    "name": "Vandenberg Ground Station",
+    "lat": 34.742,
+    "lng": -120.572,
+    "status": "online",
+    "type": "ground-station"
+  },
+  {
+    "id": "BT-003",
+    "name": "European Test Device",
+    "lat": 48.8566,
+    "lng": 2.3522,
+    "status": "offline",
+    "type": "test-device"
+  },
+  {
+    "id": "BT-004",
+    "name": "Tokyo APAC Sensor",
+    "lat": 35.6762,
+    "lng": 139.6503,
+    "status": "online",
+    "type": "sensor"
+  },
+
+  {
+    "id": "BT-005",
+    "name": "Toronto Ground Node",
+    "lat": 43.6532,
+    "lng": -79.3832,
+    "status": "online",
+    "type": "ground-station"
+  },
+  {
+    "id": "BT-006",
+    "name": "Mexico City Sensor",
+    "lat": 19.4326,
+    "lng": -99.1332,
+    "status": "offline",
+    "type": "sensor"
+  },
+  {
+    "id": "BT-007",
+    "name": "Buenos Aires Anchor",
+    "lat": -34.6037,
+    "lng": -58.3816,
+    "status": "online",
+    "type": "anchor-node"
+  },
+  {
+    "id": "BT-008",
+    "name": "Santiago Test Device",
+    "lat": -33.4489,
+    "lng": -70.6693,
+    "status": "offline",
+    "type": "test-device"
+  },
+
+  {
+    "id": "BT-009",
+    "name": "London Gateway Node",
+    "lat": 51.5074,
+    "lng": -0.1278,
+    "status": "online",
+    "type": "gateway"
+  },
+  {
+    "id": "BT-010",
+    "name": "Berlin IoT Sensor",
+    "lat": 52.52,
+    "lng": 13.405,
+    "status": "online",
+    "type": "sensor"
+  },
+  {
+    "id": "BT-011",
+    "name": "Dubai Ground Station",
+    "lat": 25.2048,
+    "lng": 55.2708,
+    "status": "offline",
+    "type": "ground-station"
+  },
+  {
+    "id": "BT-012",
+    "name": "Johannesburg Gateway Node",
+    "lat": -26.2041,
+    "lng": 28.0473,
+    "status": "online",
+    "type": "gateway"
+  },
+
+  {
+    "id": "BT-013",
+    "name": "Mumbai IoT Device",
+    "lat": 19.076,
+    "lng": 72.8777,
+    "status": "online",
+    "type": "sensor"
+  },
+  {
+    "id": "BT-014",
+    "name": "Singapore Oceanic Node",
+    "lat": 1.3521,
+    "lng": 103.8198,
+    "status": "offline",
+    "type": "oceanic"
+  },
+  {
+    "id": "BT-015",
+    "name": "Sydney Coastal Anchor",
+    "lat": -33.8688,
+    "lng": 151.2093,
+    "status": "online",
+    "type": "anchor-node"
+  },
+  {
+    "id": "BT-016",
+    "name": "Perth Experimental Test Node",
+    "lat": -31.9505,
+    "lng": 115.8605,
+    "status": "offline",
+    "type": "test-device"
+  },
+
+  {
+    "id": "BT-017",
+    "name": "North Atlantic Research Vessel",
+    "lat": 40.0,
+    "lng": -30.0,
+    "status": "online",
+    "type": "mobile-ship"
+  },
+  {
+    "id": "BT-018",
+    "name": "South Pacific Cargo Vessel",
+    "lat": -20.0,
+    "lng": -120.0,
+    "status": "online",
+    "type": "mobile-ship"
+  },
+  {
+    "id": "BT-019",
+    "name": "Mediterranean Ferry Link",
+    "lat": 36.0,
+    "lng": 18.0,
+    "status": "offline",
+    "type": "mobile-ship"
+  },
+  {
+    "id": "BT-020",
+    "name": "Transatlantic Flight 481",
+    "lat": 50.0,
+    "lng": -40.0,
+    "status": "online",
+    "type": "mobile-aircraft"
+  },
+
+  {
+    "id": "BT-021",
+    "name": "Europe-Asia Flight 912",
+    "lat": 55.0,
+    "lng": 60.0,
+    "status": "online",
+    "type": "mobile-aircraft"
+  },
+  {
+    "id": "BT-022",
+    "name": "West Coast Delivery Van",
+    "lat": 37.7749,
+    "lng": -122.4194,
+    "status": "online",
+    "type": "mobile-vehicle"
+  },
+  {
+    "id": "BT-023",
+    "name": "Midwest Service Truck",
+    "lat": 41.8781,
+    "lng": -87.6298,
+    "status": "online",
+    "type": "mobile-vehicle"
+  },
+  {
+    "id": "BT-024",
+    "name": "Gulf Coast Maintenance Boat",
+    "lat": 27.0,
+    "lng": -90.0,
+    "status": "offline",
+    "type": "mobile-ship"
+  },
+
+  {
+    "id": "BT-025",
+    "name": "Arctic Research Drone",
+    "lat": 72.0,
+    "lng": 0.0,
+    "status": "online",
+    "type": "mobile-drone"
+  },
+  {
+    "id": "BT-026",
+    "name": "Indian Ocean Survey Vessel",
+    "lat": -25.0,
+    "lng": 75.0,
+    "status": "online",
+    "type": "mobile-ship"
+  },
+  {
+    "id": "BT-027",
+    "name": "Amazon Basin Sensor Node",
+    "lat": -3.0,
+    "lng": -60.0,
+    "status": "offline",
+    "type": "sensor"
+  },
+  {
+    "id": "BT-028",
+    "name": "Cairo Urban Gateway",
+    "lat": 30.0444,
+    "lng": 31.2357,
+    "status": "online",
+    "type": "gateway"
+  },
+
+  {
+    "id": "BT-029",
+    "name": "Seoul Metro Sensor",
+    "lat": 37.5665,
+    "lng": 126.978,
+    "status": "online",
+    "type": "sensor"
+  },
+  {
+    "id": "BT-030",
+    "name": "Wellington Coastal Node",
+    "lat": -41.2865,
+    "lng": 174.7762,
+    "status": "online",
+    "type": "anchor-node"
+  },
+  {
+    "id": "BT-031",
+    "name": "Hawaii Island Gateway",
+    "lat": 19.8968,
+    "lng": -155.5828,
+    "status": "online",
+    "type": "gateway"
+  },
+  {
+    "id": "BT-032",
+    "name": "Greenland Ice Monitor",
+    "lat": 72.0,
+    "lng": -40.0,
+    "status": "offline",
+    "type": "sensor"
+  }
+]

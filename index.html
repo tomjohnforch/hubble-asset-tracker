@@ -1,0 +1,1053 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hubble Satellite & Bluetooth Tracker</title>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+      :root {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #050816;
+        color: #eaeaea;
+      }
+
+      #app {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      /* Map takes most of the space */
+      #map {
+        flex: 1 1 auto;
+      }
+
+      /* Sidebar on the right */
+      #sidebar {
+        width: 340px;
+        max-width: 38vw;
+        background: rgba(7, 10, 24, 0.98);
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 14px 16px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      #sidebar h1 {
+        font-size: 18px;
+        margin: 0;
+      }
+
+      #sidebar .subtitle {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 2px;
+      }
+
+      #controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      #filter {
+        padding: 4px 6px;
+        background: #111827;
+        color: #e5e7eb;
+        border-radius: 4px;
+        border: 1px solid #374151;
+        font-size: 12px;
+      }
+
+      #device-count {
+        font-size: 12px;
+        color: #9ca3af;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        margin-top: 2px;
+      }
+
+      .section-header span:last-child {
+        font-size: 10px;
+        opacity: 0.8;
+      }
+
+      #sat-section {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 6px;
+      }
+
+      #sat-list {
+  list-style: none;
+  margin: 4px 0 0 0;
+  padding: 0;
+  max-height: 150px;
+  overflow-y: scroll; /* always show scrollbar */
+}
+
+/* Satellite list scrollbar */
+#sat-list::-webkit-scrollbar {
+  width: 10px;               
+}
+
+#sat-list::-webkit-scrollbar-thumb {
+  background: #555;          
+  border-radius: 4px;
+  border: 2px solid #2b2d42;
+}
+
+#sat-list::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+#sat-list::-webkit-scrollbar-track {
+  background: #1b1d2b;
+}
+
+
+      .sat-item {
+        padding: 6px 4px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 11px;
+      }
+
+      .sat-item:hover {
+        background: rgba(31, 41, 55, 0.8);
+      }
+
+      .sat-name {
+        font-size: 12px;
+      }
+
+      .sat-health-ok {
+  color: #4ade80; /* green-400 */
+}
+
+.sat-health-bad {
+  color: #facc15; /* amber-300 */
+}
+
+      .sat-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #9ca3af;
+      }
+
+      #devices-section {
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 6px;
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      #device-list {
+  flex: 1 1 auto;
+  overflow-y: scroll; /* always show scrollbar */
+  margin: 4px 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Device list scrollbar */
+#device-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+#device-list::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+  border: 2px solid #2b2d42;
+}
+
+#device-list::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+#device-list::-webkit-scrollbar-track {
+  background: #1b1d2b;
+}
+
+
+      .device-item {
+        padding: 8px 4px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .device-item:hover {
+        background: rgba(31, 41, 55, 0.8);
+      }
+
+      .device-name {
+        font-size: 13px;
+      }
+
+      .device-meta {
+        font-size: 11px;
+        color: #9ca3af;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .status-pill {
+        padding: 2px 6px;
+        border-radius: 999px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .status-online {
+        background: rgba(16, 185, 129, 0.15);
+        color: #6ee7b7;
+        border: 1px solid rgba(16, 185, 129, 0.4);
+      }
+
+      .status-offline {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fecaca;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+      }
+
+      .legend {
+        background: #ffffff;
+        padding: 8px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        line-height: 1.4;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .legend-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+
+      .legend-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .legend-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 6px;
+      }
+
+      .legend-dot.sat {
+        background: #ff5722;
+      }
+
+      .legend-dot.bt {
+        background: #2196f3;
+      }
+
+      .legend-dot.link {
+        background: transparent;
+        border: 2px solid #22c55e;
+      }
+
+      @media (max-width: 800px) {
+        /* On small screens, stack map and sidebar */
+        #app {
+          flex-direction: column;
+        }
+        #sidebar {
+          width: 100%;
+          max-width: 100%;
+          height: 45vh;
+        }
+        #map {
+          height: 55vh;
+        }
+      }
+
+      /* ===== Improved Legend Styling ===== */
+
+.legend {
+  background: rgba(17, 24, 39, 0.95); /* dark slate background */
+  color: #f9fafb;                     /* bright white text */
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Each row */
+.legend-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.legend-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Color dots */
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+/* Colors that match your icons/links */
+.legend-dot.sat {
+  background: #ff4f4f; /* red/orange satellite icon color */
+}
+
+.legend-dot.bt {
+  background: #3b82f6; /* blue for bluetooth devices */
+}
+
+.legend-dot.link {
+  background: #22c55e; /* green for link lines */
+}
+
+/* Legend container + rows (keep whatever you already had for .legend / .legend-row) */
+
+/* Mini icon base */
+.legend-icon {
+  width: 18px;             /* controls overall icon size */
+  height: 18px;
+  margin-right: 8px;
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;  /* auto-scale to fit, keeps aspect ratio */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+/* Use the same files as your map markers */
+.legend-icon-sat {
+  background-image: url("icons/icons8-satellite-50.png");
+}
+
+.legend-icon-bt {
+  background-image: url("icons/bluetooth7.png");
+}
+
+/* Mini dashed link line */
+.legend-link-mini {
+  display: inline-block;
+  width: 30px;                /* length of the sample line */
+  height: 0;
+  margin-right: 8px;
+  border-bottom: 2px dashed #22c55e;  /* same green as your links */
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.leaflet-tile {
+  filter: brightness(1.15) contrast(1.05);
+}
+
+
+
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <div id="map"></div>
+
+      <aside id="sidebar">
+        <div>
+          <h1>Hubble Asset Tracker</h1>
+          <div class="subtitle">
+            Hubble Network pathfinder satellites + ground &amp; mobile Bluetooth
+            devices
+          </div>
+        </div>
+
+        <div id="controls">
+          <div id="device-count">Devices: 0</div>
+          <select id="filter">
+            <option value="all">All statuses</option>
+            <option value="online">Online only</option>
+            <option value="offline">Offline only</option>
+          </select>
+        </div>
+
+        <section id="sat-section">
+          <div class="section-header">
+            <span>Satellites</span>
+            <span id="sat-count">0</span>
+          </div>
+          <ul id="sat-list"></ul>
+        </section>
+
+        <section id="devices-section">
+          <div class="section-header">
+            <span>Devices</span>
+          </div>
+          <ul id="device-list"></ul>
+        </section>
+      </aside>
+    </div>
+
+    <!-- satellite.js for SGP4 orbit propagation -->
+    <script src="https://unpkg.com/satellite.js/dist/satellite.min.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+      // -------- Simulation constants ---------
+      const HEARTBEAT_INTERVAL_MS = 5000; // how often we simulate heartbeats
+      const OFFLINE_AFTER_MS = 30000; // no heartbeat for this long -> offline
+      const LINK_THRESHOLD_KM = 3500; // coverage radius
+
+      // -------- Base Map ---------
+      const map = L.map("map", {
+  worldCopyJump: false,
+  maxBounds: [
+    [-85, -180],
+    [85, 180]
+  ],
+  maxBoundsViscosity: 1.0
+}).setView([10, 0], 2);
+
+  L.tileLayer(
+  "https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+  {
+    maxZoom: 6,
+    noWrap: true,
+    attribution: "&copy; Carto"
+  }
+).addTo(map);
+
+
+
+// Custom Bluetooth icon
+      const bluetoothIcon = L.icon({
+  iconUrl: "icons/bluetooth7.png",  // path inside your project
+  iconSize: [28, 28],              // tweak for size
+  iconAnchor: [14, 14],            // center the icon
+  popupAnchor: [0, -14]            // popup slightly above
+});
+
+// Custom Satellite icon
+const satelliteIcon = L.icon({
+  iconUrl: "icons/icons8-satellite-50.png", // <-- match your filename exactly
+  iconSize: [28, 28],             // adjust as needed
+  iconAnchor: [16, 16],           // center the icon
+  popupAnchor: [0, -16]
+});
+
+      // -------- Satellites (Hubble Network via TLE + SGP4) ---------
+      let satellites = []; // { name, catnr, satrec, lat, lng, altKm, linkCount }
+      let satelliteMarkers = []; // { sat, marker }
+
+      const satListEl = document.getElementById("sat-list");
+      const satCountEl = document.getElementById("sat-count");
+
+      async function fetchTleByCatnr(catnr) {
+        const url = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${encodeURIComponent(
+          catnr
+        )}&FORMAT=TLE`;
+
+        const res = await fetch(url);
+        const text = await res.text();
+        const lines = text.trim().split(/\r?\n/);
+
+        let name = `NORAD ${catnr}`;
+        let tle1, tle2;
+
+        if (lines.length >= 3) {
+          name = lines[0].trim();
+          tle1 = lines[1].trim();
+          tle2 = lines[2].trim();
+        } else if (lines.length >= 2) {
+          tle1 = lines[0].trim();
+          tle2 = lines[1].trim();
+        } else {
+          throw new Error("Unexpected TLE format for CATNR " + catnr);
+        }
+
+        const satrec = satellite.twoline2satrec(tle1, tle2);
+
+        return {
+          name,
+  catnr,
+  tle1,
+  tle2,
+  satrec,
+  lat: 0,
+  lng: 0,
+  altKm: null,
+  linkCount: 0,
+  validPosition: false
+        };
+      }
+
+      async function initSatellites() {
+        try {
+          // Hubble Network pathfinder satellites (Spire Lemur-based)
+          const catnrs = [
+            59146, // Hubble 1
+            59147, // Hubble 2
+            60417, // Hubble 3
+            60533, // Hubble 4
+            60536 // Hubble 5
+          ];
+
+          const promises = catnrs.map((c) => fetchTleByCatnr(c));
+          satellites = await Promise.all(promises);
+
+          satelliteMarkers = satellites.map((sat) => {
+  const marker = L.marker([0, 0], {
+  icon: satelliteIcon
+}).addTo(map);
+
+
+  // When you click a satellite marker, draw its future path
+  marker.on("click", () => {
+    drawProjectionForSatellite(sat);
+  });
+
+  return { sat, marker };
+});
+
+
+          // Position once initially (also sets popups)
+          updateSatellitePositions(true);
+          renderSatellitesList();
+        } catch (err) {
+          console.error("Failed to initialize satellites", err);
+        }
+      }
+
+      function updateSatellitePositions(initial = false) {
+  if (!satellites.length || !satelliteMarkers.length) return;
+
+  const now = new Date();
+  const gmst = satellite.gstime(now);
+
+  satelliteMarkers.forEach(({ sat, marker }) => {
+    const pv = satellite.propagate(sat.satrec, now);
+    if (!pv.position) {
+      sat.validPosition = false;
+      return;
+    }
+
+    const gd = satellite.eciToGeodetic(pv.position, gmst);
+    const lat = satellite.degreesLat(gd.latitude);
+    const lon = satellite.degreesLong(gd.longitude);
+    const altKm = gd.height; // km
+
+    if (!isFinite(lat) || !isFinite(lon) || !isFinite(altKm)) {
+      sat.validPosition = false;
+      return;
+    }
+
+    sat.lat = lat;
+    sat.lng = lon;
+    sat.altKm = altKm;
+    sat.validPosition = true;
+
+    marker.setLatLng([lat, lon]);
+
+    // Keep popup text in sync
+    marker.bindPopup(
+      `<b>${sat.name}</b><br>NORAD: ${
+        sat.catnr
+      }<br>Alt: ${altKm.toFixed(
+        0
+      )} km<br>Lat: ${lat.toFixed(2)}, Lng: ${lon.toFixed(2)}`
+    );
+  });
+
+  if (!initial) {
+    renderSatellitesList();
+  }
+}
+
+
+      function renderSatellitesList() {
+  if (!satListEl) return;
+
+  satListEl.innerHTML = "";
+  satCountEl.textContent = satellites.length.toString();
+
+  satellites.forEach((sat) => {
+    const li = document.createElement("li");
+    li.className = "sat-item";
+
+    const links = sat.linkCount || 0;
+    const hasPos = sat.validPosition && isFinite(sat.lat) && isFinite(sat.lng);
+    const alt =
+      sat.altKm != null && isFinite(sat.altKm)
+        ? `${sat.altKm.toFixed(0)} km`
+        : "—";
+    const latText = hasPos ? sat.lat.toFixed(1) : "—";
+    const lngText = hasPos ? sat.lng.toFixed(1) : "—";
+
+    const healthLabel = hasPos ? "✅ Position OK" : "⚠️ TLE / position";
+    const healthClass = hasPos ? "sat-health-ok" : "sat-health-bad";
+
+    li.innerHTML = `
+      <div class="sat-name">${sat.name}</div>
+      <div class="sat-meta">
+        <span>NORAD: ${sat.catnr}</span>
+        <span class="${healthClass}">${healthLabel}</span>
+      </div>
+      <div class="sat-meta">
+        <span>Alt: ${alt}</span>
+        <span>Links: ${links}</span>
+      </div>
+      <div class="sat-meta">
+        <span>Lat: ${latText}, Lng: ${lngText}</span>
+        <span></span>
+      </div>
+    `;
+
+    li.addEventListener("click", () => {
+      const markerObj = satelliteMarkers.find((m) => m.sat === sat);
+      if (markerObj && hasPos) {
+        map.flyTo([sat.lat, sat.lng], 3, { duration: 0.8 });
+        markerObj.marker.openPopup();
+      }
+      drawProjectionForSatellite(sat);
+    });
+
+    satListEl.appendChild(li);
+  });
+}
+
+
+
+
+      // -------- Devices ---------
+      let allDevices = [];
+      let deviceMarkers = {}; // id -> marker
+      let mobileDevices = {}; // id -> { dev, marker, dLat, dLng }
+
+      const deviceListEl = document.getElementById("device-list");
+      const deviceCountEl = document.getElementById("device-count");
+      const filterEl = document.getElementById("filter");
+
+      // link polyline storage
+      let activeLinks = [];
+      // Active satellite future path (for the last clicked satellite)
+let activeProjection = null; // { outer, inner }
+
+
+      // Haversine distance in km
+      function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const toRad = (deg) => (deg * Math.PI) / 180;
+
+  const φ1 = toRad(lat1);
+  const φ2 = toRad(lat2);
+  const Δφ = toRad(lat2 - lat1);
+  const Δλ = toRad(lon2 - lon1); // IMPORTANT: lon2 - lon1
+
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // distance in km
+}
+
+// Compute a ground track for this satellite for up to maxDistanceKm ahead
+function computeProjectionPath(sat, maxDistanceKm = 3500) {
+  const points = [];
+  const now = new Date();
+
+  if (!sat.validPosition || !isFinite(sat.lat) || !isFinite(sat.lng)) {
+    return points;
+  }
+
+  let lastLat = sat.lat;
+  let lastLng = sat.lng;
+  points.push([lastLat, lastLng]);
+
+  const stepSeconds = 20;         // time step between points
+  const maxSecondsAhead = 900;    // ~15 minutes max
+
+  let traveled = 0;
+
+  for (let t = stepSeconds; t <= maxSecondsAhead; t += stepSeconds) {
+    const tDate = new Date(now.getTime() + t * 1000);
+    const gmst = satellite.gstime(tDate);
+    const pv = satellite.propagate(sat.satrec, tDate);
+    if (!pv.position) break;
+
+    const gd = satellite.eciToGeodetic(pv.position, gmst);
+    const lat = satellite.degreesLat(gd.latitude);
+    const lng = satellite.degreesLong(gd.longitude);
+
+    if (!isFinite(lat) || !isFinite(lng)) break;
+
+    traveled += haversineKm(lastLat, lastLng, lat, lng);
+    points.push([lat, lng]);
+
+    if (traveled >= maxDistanceKm) break;
+
+    lastLat = lat;
+    lastLng = lng;
+  }
+
+  return points;
+}
+
+// Draw (or replace) the shaded projection path for a satellite
+function drawProjectionForSatellite(sat) {
+  if (!sat || !sat.validPosition) return;
+
+  // remove previous projection if any
+  if (activeProjection) {
+    map.removeLayer(activeProjection.outer);
+    map.removeLayer(activeProjection.inner);
+    activeProjection = null;
+  }
+
+  const pts = computeProjectionPath(sat, 3500);
+  if (pts.length < 2) return;
+
+  // Outer soft ribbon (light red, wide, translucent)
+  const outer = L.polyline(pts, {
+    color: "#fca5a5",     // light red
+    weight: 20,
+    opacity: 0.25
+  }).addTo(map);
+
+  // Inner bright centerline
+  const inner = L.polyline(pts, {
+    color: "#f97373",     // slightly stronger red
+    weight: 4,
+    opacity: 0.9
+  }).addTo(map);
+
+  activeProjection = { outer, inner };
+}
+
+// Make a 2-point line wrap nicely across the dateline instead of spanning the whole map
+function wrappedLinePoints(lat1, lng1, lat2, lng2) {
+  let aLng = lng1;
+  let bLng = lng2;
+
+  if (Math.abs(lng1 - lng2) > 180) {
+    // Long jump across the dateline: adjust one side by 360°
+    if (lng1 > lng2) {
+      aLng -= 360;
+    } else {
+      bLng -= 360;
+    }
+  }
+
+  return [
+    [lat1, aLng],
+    [lat2, bLng]
+  ];
+}
+
+
+
+      // Draw / refresh link lines between sats & visible devices
+      function updateLinks() {
+        activeLinks.forEach((line) => map.removeLayer(line));
+        activeLinks = [];
+
+        const visibleDeviceMarkers = Object.values(deviceMarkers);
+        if (!visibleDeviceMarkers.length || !satellites.length) return;
+
+        // reset link counts
+        satellites.forEach((sat) => {
+          sat.linkCount = 0;
+        });
+
+        satellites.forEach((sat) => {
+          visibleDeviceMarkers.forEach((marker) => {
+            const dev = marker.dev;
+            const distance = haversineKm(
+              sat.lat,
+              sat.lng,
+              dev.lat,
+              dev.lng
+            );
+
+            if (distance < LINK_THRESHOLD_KM) {
+             const points = wrappedLinePoints(sat.lat, sat.lng, dev.lat, dev.lng);
+
+const line = L.polyline(points, {
+  color: "#22c55e",
+  weight: 1.5,
+  opacity: 0.7,
+  dashArray: "4,4"
+}).addTo(map);
+
+
+              activeLinks.push(line);
+              sat.linkCount++;
+            }
+          });
+        });
+
+        // after updating link counts, refresh satellite list
+        renderSatellitesList();
+      }
+
+      // Update only mobile device positions
+      function updateMobileDevicePositions() {
+        const ids = Object.keys(mobileDevices);
+        if (!ids.length) return;
+
+        ids.forEach((id) => {
+          const obj = mobileDevices[id];
+          const dev = obj.dev;
+          const marker = obj.marker;
+
+          dev.lat += obj.dLat;
+          dev.lng += obj.dLng;
+
+          // constrain lat / lng a bit
+          if (dev.lat > 75 || dev.lat < -75) {
+            obj.dLat *= -1;
+          }
+          if (dev.lng > 180) dev.lng -= 360;
+          if (dev.lng < -180) dev.lng += 360;
+
+          marker.setLatLng([dev.lat, dev.lng]);
+        });
+      }
+
+      // Main animation tick (every second)
+      function animationTick() {
+        updateSatellitePositions();
+        updateMobileDevicePositions();
+        if (Object.keys(deviceMarkers).length > 0) {
+          updateLinks();
+        }
+      }
+
+      setInterval(animationTick, 1000);
+
+      // --- Heartbeat simulation: update lastSeen + online/offline ---
+      function simulateHeartbeats() {
+        if (!allDevices.length) return;
+        const now = Date.now();
+
+        allDevices.forEach((dev) => {
+          const isMobile = dev.type && dev.type.startsWith("mobile");
+          const heartbeatProb = isMobile ? 0.6 : 0.35;
+
+          // Random chance this device sends a heartbeat in this interval
+          if (Math.random() < heartbeatProb) {
+            dev.lastSeen = now;
+            dev.status = "online";
+          } else {
+            // If no heartbeat for a while, mark offline
+            if (now - dev.lastSeen > OFFLINE_AFTER_MS) {
+              dev.status = "offline";
+            }
+          }
+        });
+
+        // Refresh UI + markers to reflect new statuses / lastSeen
+        renderDevices();
+      }
+
+      setInterval(simulateHeartbeats, HEARTBEAT_INTERVAL_MS);
+
+      // Fetch devices from local JSON file
+      fetch("devices.json")
+        .then((res) => res.json())
+        .then((data) => {
+          const now = Date.now();
+          allDevices = data.map((dev) => {
+            const jitter = Math.floor(Math.random() * OFFLINE_AFTER_MS);
+            return {
+              ...dev,
+              lastSeen: now - jitter
+            };
+          });
+          allDevices.forEach((dev) => {
+            if (
+              now - dev.lastSeen > OFFLINE_AFTER_MS &&
+              dev.status === "online"
+            ) {
+              dev.status = "offline";
+            }
+          });
+          renderDevices();
+        })
+        .catch((err) => {
+          console.error("Failed to load devices.json", err);
+        });
+
+      // Format "last seen" nicely
+      function formatLastSeen(dev) {
+        const ageMs = Date.now() - dev.lastSeen;
+        const ageSec = Math.round(ageMs / 1000);
+
+        if (ageSec < 5) return "live";
+        if (ageSec < 60) return `${ageSec}s ago`;
+        const mins = Math.round(ageSec / 60);
+        return `${mins}m ago`;
+      }
+
+      function renderDevices() {
+        const filter = filterEl.value; // all | online | offline
+
+        deviceListEl.innerHTML = "";
+
+        // remove old markers
+        Object.values(deviceMarkers).forEach((marker) => {
+          map.removeLayer(marker);
+        });
+        deviceMarkers = {};
+        mobileDevices = {};
+
+        const filtered = allDevices.filter((dev) => {
+          if (filter === "all") return true;
+          return dev.status === filter;
+        });
+
+        deviceCountEl.textContent = `Devices: ${filtered.length}`;
+
+        filtered.forEach((dev) => {
+          // marker on map
+          const marker = L.marker([dev.lat, dev.lng], {
+  icon: bluetoothIcon
+}).addTo(map);
+marker.dev = dev; // attach data
+ // attach data
+
+          marker.bindPopup(
+            `<b>${dev.name}</b><br>ID: ${dev.id}<br>Status: ${
+              dev.status
+            }<br>Type: ${
+              dev.type
+            }<br>Last seen: ${formatLastSeen(dev)}<br>Lat: ${dev.lat.toFixed(
+              2
+            )}, Lng: ${dev.lng.toFixed(2)}`
+          );
+          deviceMarkers[dev.id] = marker;
+
+          // mark as mobile if type startsWith "mobile"
+          if (dev.type && dev.type.startsWith("mobile")) {
+            let speedFactor = 0.25;
+            if (dev.type === "mobile-aircraft") speedFactor = 0.7;
+            else if (dev.type === "mobile-ship") speedFactor = 0.2;
+            else if (dev.type === "mobile-vehicle") speedFactor = 0.4;
+            else if (dev.type === "mobile-drone") speedFactor = 0.5;
+
+            const base = 0.1 * speedFactor;
+            const dLat = (Math.random() - 0.5) * base;
+            const dLng = (Math.random() - 0.5) * base * 2;
+
+            mobileDevices[dev.id] = { dev, marker, dLat, dLng };
+          }
+
+          // list item in sidebar
+          const li = document.createElement("li");
+          li.className = "device-item";
+          li.innerHTML = `
+            <div class="device-name">${dev.name}</div>
+            <div class="device-meta">
+              <span>${dev.id}</span>
+              <span class="status-pill ${
+                dev.status === "online"
+                  ? "status-online"
+                  : "status-offline"
+              }">${dev.status}</span>
+            </div>
+            <div class="device-meta">
+              <span>${dev.type}</span>
+              <span>Last seen: ${formatLastSeen(dev)}</span>
+            </div>
+          `;
+
+          li.addEventListener("click", () => {
+            map.flyTo([dev.lat, dev.lng], 4, { duration: 0.8 });
+            marker.openPopup();
+          });
+
+          deviceListEl.appendChild(li);
+        });
+
+        // recompute links & thus satellite link counts
+        updateLinks();
+      }
+
+      filterEl.addEventListener("change", renderDevices);
+
+      // -------- Legend ---------
+      const legend = L.control({ position: "bottomleft" });
+
+      legend.onAdd = function () {
+  const div = L.DomUtil.create("div", "legend");
+  div.innerHTML = `
+    <div class="legend-row">
+      <span class="legend-icon legend-icon-sat"></span>
+      <span>Hubble Network satellites</span>
+    </div>
+    <div class="legend-row">
+      <span class="legend-icon legend-icon-bt"></span>
+      <span>Bluetooth devices (ground &amp; mobile)</span>
+    </div>
+    <div class="legend-row">
+      <span class="legend-link-mini"></span>
+      <span>Active links (&lt; ${LINK_THRESHOLD_KM.toLocaleString()} km)</span>
+    </div>
+  `;
+  return div;
+};
+
+
+      legend.addTo(map);
+
+      // Kick off satellite loading
+      initSatellites();
+    </script>
+  </body>
+</html>
