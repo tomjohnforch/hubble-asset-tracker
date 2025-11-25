@@ -1,3 +1,12 @@
+<div align="center">
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-hubble--asset--tracker-blue?style=for-the-badge)](https://hubble-asset-tracker.onrender.com)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-hubble--asset--tracker-24292e?style=for-the-badge&logo=github)](https://github.com/tomjohnforch/hubble-asset-tracker)
+[![Tech](https://img.shields.io/badge/Powered_by-satellite.js-green?style=for-the-badge)](https://github.com/shashwatak/satellite-js)
+[![Leaflet](https://img.shields.io/badge/Map-LeafletJS-199900?style=for-the-badge&logo=leaflet)](https://leafletjs.com)
+
+</div>
+
 🛰️ Hubble Asset Tracker — Demo Application
 
 This project is an interactive visualization prototype inspired by the mission of Hubble Network:
